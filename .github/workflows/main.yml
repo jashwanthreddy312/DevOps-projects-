@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       # 2. Debug repository structure
-      - name: Debug repository structure
+      - name: Debug repository structure 
         run: |
           pwd
           ls
