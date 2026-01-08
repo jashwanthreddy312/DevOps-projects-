@@ -1,4 +1,4 @@
-name: Java Build and Deploy to Azure VM
+name: Build and Deploy Java WAR to Azure VM (Tomcat)
 
 on:
   push:
@@ -10,59 +10,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout source code
+      # 1. Checkout code
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # 2. Debug repo structure (safe to keep or remove later)
+      # 2. Debug repository structure
       - name: Debug repository structure
         run: |
           pwd
           ls
           ls "DevOps Project-01"
 
-      # 3. Set up Java
+      # 3. Setup Java
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      # 4. Give execute permission to mvnw
-      - name: Grant execute permission to mvnw
-        working-directory: "DevOps Project-01/Java-Login-App"
-        run: chmod +x mvnw
-
-      # 5. Build application using Maven Wrapper
+      # 4. Build WAR using Maven
       - name: Build with Maven
         working-directory: "DevOps Project-01/Java-Login-App"
         run: mvn clean package -DskipTests
-        
-      # 5.1. Verify jar file
-      - name: Verify JAR file exists
-        run: |
-         echo "Listing target directory:"
-         ls "DevOps Project-01/Java-Login-App/target"
-         echo "Finding all JAR files:"
-         find . -type f -name "*.jar"
 
-      # 6. Copy JAR to Azure VM
-      - name: Copy JAR to Azure VM
+      # 5. Verify WAR file exists
+      - name: Verify WAR file exists
+        run: |
+          echo "Listing target directory:"
+          ls "DevOps Project-01/Java-Login-App/target"
+          echo "Finding WAR files:"
+          find . -type f -name "*.war"
+
+      # 6. Copy WAR to Azure VM
+      - name: Copy WAR to Azure VM
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.AZURE_VM_HOST }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          source: "DevOps Project-01/Java-Login-App/target/*.jar"
+          source: "DevOps Project-01/Java-Login-App/target/*.war"
           target: ${{ secrets.AZURE_APP_DIR }}
 
-      # 7. Run application on Azure VM
-      - name: Run application on Azure VM
+      # 7. Deploy WAR to Tomcat
+      - name: Deploy WAR to Tomcat
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.AZURE_VM_HOST }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
-            pkill -f java || true
-            nohup java -jar ${{ secrets.AZURE_APP_DIR }}/*.jar > app.log 2>&1 &
+            sudo cp ${{ secrets.AZURE_APP_DIR }}/*.war /var/lib/tomcat9/webapps/
+            sudo systemctl restart tomcat9
