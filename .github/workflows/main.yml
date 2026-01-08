@@ -19,10 +19,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build with Maven
-         run:|
-            cd project-a
-            mvn clean package -DskipTests
+      - name: Build with maven
+         working-directory: project-a
+        run: mvn clean package -DskipTests
+
 
 
       - name: Copy JAR to Azure VM
@@ -31,7 +31,7 @@ jobs:
           host: ${{ secrets.AZURE_VM_HOST }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          source: "target/*.jar"
+          source: "project-a/target/*.jar"
           target: ${{ secrets.AZURE_APP_DIR }}
 
       - name: Run application on Azure VM
