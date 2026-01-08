@@ -3,7 +3,7 @@ name: Java Build and Deploy to Azure VM
 on:
   push:
     branches:
-      - feature1
+      - main
 
 jobs:
   build-and-deploy:
