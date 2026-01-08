@@ -19,11 +19,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build with maven
-         working-directory: project-a
+      - name: Build with Maven
+        working-directory: project-a
         run: mvn clean package -DskipTests
-
-
 
       - name: Copy JAR to Azure VM
         uses: appleboy/scp-action@v0.1.7
@@ -42,4 +40,4 @@ jobs:
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             pkill -f java || true
-            nohup java -jar ${{ secrets.AZURE_APP_DIR }}/target/*.jar > app.log 2>&1 &
+            nohup java -jar ${{ secrets.AZURE_APP_DIR }}/*.jar > app.log 2>&1 &
