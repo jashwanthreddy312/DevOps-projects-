@@ -20,7 +20,10 @@ jobs:
           java-version: '17'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+         run:|
+            cd project-a
+            mvn clean package -DskipTests
+
 
       - name: Copy JAR to Azure VM
         uses: appleboy/scp-action@v0.1.7
