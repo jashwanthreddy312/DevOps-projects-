@@ -13,14 +13,17 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Show repository structure
+        run: ls -R
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
       - name: Build with Maven
-        working-directory: project-a
+        working-directory: DevOps-Project-01/Java-Login-App
         run: mvn clean package -DskipTests
 
       - name: Copy JAR to Azure VM
@@ -29,7 +32,7 @@ jobs:
           host: ${{ secrets.AZURE_VM_HOST }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          source: "project-a/target/*.jar"
+          source: "java-login-app/target/*.jar"
           target: ${{ secrets.AZURE_APP_DIR }}
 
       - name: Run application on Azure VM
